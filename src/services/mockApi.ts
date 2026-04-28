@@ -1,4 +1,4 @@
-import { ClassData } from '../types';
+import { ClassData, DashboardStat, AttendanceLog } from '../types';
 
 // Calcula a distância entre duas coordenadas usando a Fórmula de Haversine
 function getDistanceInMeters(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -83,5 +83,21 @@ export const mockApi = {
         resolve({ success: true, message: 'Presença confirmada!' });
       }, 1500);
     });
+  },
+
+  getDashboard: async (alunoId: string): Promise<DashboardStat[]> => {
+    return new Promise(resolve => setTimeout(() => resolve([
+      { id: '1', subject: 'Matemática Aplicada', attendancePercentage: 85, status: 'Aprovado' },
+      { id: '2', subject: 'História da Computação', attendancePercentage: 70, status: 'Em Risco' },
+      { id: '3', subject: 'Física I', attendancePercentage: 50, status: 'Reprovado' },
+    ]), 1000));
+  },
+
+  getHistorico: async (alunoId: string): Promise<AttendanceLog[]> => {
+    return new Promise(resolve => setTimeout(() => resolve([
+      { id: 'h1', date: '27/04/2026', time: '08:00', subject: 'Matemática Aplicada' },
+      { id: 'h2', date: '26/04/2026', time: '10:00', subject: 'História da Computação' },
+      { id: 'h3', date: '25/04/2026', time: '08:00', subject: 'Matemática Aplicada' },
+    ]), 1000));
   }
 };
