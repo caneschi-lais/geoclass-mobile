@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, Image } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import api from '../services/api';
-import { saveToken } from '../services/authStorage';
+import { saveToken, saveRole } from '../services/authStorage';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { UserRole } from '../types';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
@@ -22,15 +23,26 @@ export default function LoginScreen({ navigation }: Props) {
 
     setLoading(true);
     try {
-      // Faz a requisição de login
-      const response = await api.post('/login', { email, password });
+      // Faz a requisição de login (simulado ou real)
+      const response = await api.post('/login', { email, password }).catch(() => {
+         // Fallback provisório para o mock enquanto a API real não sobe
+         return { data: { token: 'mocked-jwt-token-123' } };
+      });
       
       const token = response.data?.token;
 
       if (token) {
+        let role: UserRole = 'ALUNO';
+        if (email.toLowerCase().includes('prof')) role = 'PROFESSOR';
+        if (email.toLowerCase().includes('coord')) role = 'COORDENADOR';
+
         await saveToken(token);
-        // Redireciona para a tela inicial
-        navigation.replace('Home');
+        await saveRole(role);
+        
+        // Redireciona para o fluxo principal baseado no Role
+        if (role === 'PROFESSOR') navigation.replace('ProfessorApp');
+        else if (role === 'COORDENADOR') navigation.replace('CoordinatorApp');
+        else navigation.replace('AlunoApp');
       } else {
         Alert.alert('Erro', 'Token não retornado pelo servidor.');
       }

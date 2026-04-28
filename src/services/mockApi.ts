@@ -1,4 +1,4 @@
-import { ClassData, DashboardStat, AttendanceLog } from '../types';
+import { ClassData, DashboardStat, AttendanceLog, StudentAttendance, CoordinatorAnalytics, StudentRisk } from '../types';
 
 // Calcula a distância entre duas coordenadas usando a Fórmula de Haversine
 function getDistanceInMeters(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -99,5 +99,31 @@ export const mockApi = {
       { id: 'h2', date: '26/04/2026', time: '10:00', subject: 'História da Computação' },
       { id: 'h3', date: '25/04/2026', time: '08:00', subject: 'Matemática Aplicada' },
     ]), 1000));
+  },
+
+  getProfessorTurmas: async (professorId: string): Promise<ClassData[]> => {
+    return new Promise(resolve => setTimeout(() => resolve(MOCK_CLASSES), 1000));
+  },
+
+  getTurmaPresencas: async (turmaId: string): Promise<StudentAttendance[]> => {
+    return new Promise(resolve => setTimeout(() => resolve([
+      { id: '1', name: 'João Silva', ra: 'RA123456', time: '07:55' },
+      { id: '2', name: 'Maria Souza', ra: 'RA654321', time: '08:02' },
+      { id: '3', name: 'Pedro Santos', ra: 'RA112233', time: '08:14' },
+    ]), 1000));
+  },
+
+  getCoordinatorAnalytics: async (): Promise<{ analytics: CoordinatorAnalytics, atRisk: StudentRisk[] }> => {
+    return new Promise(resolve => setTimeout(() => resolve({
+      analytics: {
+        totalStudents: 1542,
+        activeClasses: 48,
+      },
+      atRisk: [
+        { id: '1', name: 'Carlos Ferreira', ra: 'RA998877', attendancePercentage: 68 },
+        { id: '2', name: 'Ana Oliveira', ra: 'RA554433', attendancePercentage: 55 },
+        { id: '3', name: 'Lucas Mendes', ra: 'RA223344', attendancePercentage: 72 },
+      ]
+    }), 1000));
   }
 };

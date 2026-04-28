@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator, Platform } from 'react-native';
+import { View, FlatList, Alert, Platform } from 'react-native';
 import * as Location from 'expo-location';
 import * as Device from 'expo-device';
 import * as Application from 'expo-application';
-import { deleteToken } from '../services/authStorage';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
 import { mockApi } from '../services/mockApi';
 import { ClassData } from '../types';
 import ClassCard from '../components/ClassCard';
+import ScreenHeader from '../components/ScreenHeader';
+import LoadingOverlay from '../components/LoadingOverlay';
+import EmptyState from '../components/EmptyState';
 
 type Props = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
+  navigation: any; // Type hacking para simplificar navegação aninhada
 };
 
 export default function HomeScreen({ navigation }: Props) {
@@ -25,13 +25,14 @@ export default function HomeScreen({ navigation }: Props) {
 
   const loadInitialData = async () => {
     try {
-      // 1. Pedir permissão de localização ao abrir a tela
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Aviso', 'A permissão de localização é necessária para registrar presença.');
+        Alert.alert(
+          'Permissão Necessária', 
+          'Precisamos da sua localização (apenas durante o uso) exclusivamente para validar sua presença na sala de aula. Não faremos rastreamento contínuo.'
+        );
       }
 
-      // 2. Buscar aulas do dia (Mock)
       const aulas = await mockApi.getAulasHoje();
       setClasses(aulas);
     } catch (error) {
@@ -55,26 +56,25 @@ export default function HomeScreen({ navigation }: Props) {
     setProcessingId(aula.id);
 
     try {
-      // 1. Checar se tem permissão novamente
       const { status } = await Location.getForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Acesso Negado', 'Precisamos da sua localização para confirmar a presença.');
+        Alert.alert(
+          'Acesso Negado', 
+          'A permissão de localização é estritamente necessária para confirmar que você está fisicamente na sala de aula. Habilite nas configurações.'
+        );
         setProcessingId(null);
         return;
       }
 
-      // 2. Obter localização atual
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High
       });
       const lat = location.coords.latitude;
       const lon = location.coords.longitude;
 
-      // 3. Obter ID do dispositivo
       const deviceId = await getUniqueDeviceId();
 
-      // 4. Enviar para a API
-      const result = await mockApi.registrarPresenca(aula.id, lat, lon, deviceId);
+      await mockApi.registrarPresenca(aula.id, lat, lon, deviceId);
       
       Alert.alert('Sucesso', 'Presença registrada com sucesso!');
       
@@ -86,28 +86,18 @@ export default function HomeScreen({ navigation }: Props) {
     }
   };
 
-  const handleLogout = async () => {
-    await deleteToken();
-    navigation.replace('Login');
-  };
-
-  if (loadingInitial) {
-    return (
-      <View className="flex-1 justify-center items-center bg-gray-50">
-        <ActivityIndicator size="large" color="#0ea5e9" />
-        <Text className="mt-4 text-gray-500 font-medium">Buscando aulas de hoje...</Text>
-      </View>
-    );
-  }
+  if (loadingInitial) return <LoadingOverlay message="Buscando aulas de hoje..." />;
 
   return (
     <View className="flex-1 bg-gray-50 pt-14 px-4">
-      <View className="flex-row justify-between items-center mb-6">
-        <Text className="text-3xl font-extrabold text-gray-800">Aulas de Hoje</Text>
-        <TouchableOpacity onPress={handleLogout} className="bg-red-100 px-3 py-2 rounded-lg">
-          <Text className="text-red-600 font-bold">Sair</Text>
-        </TouchableOpacity>
-      </View>
+      <ScreenHeader 
+        title="Aulas de Hoje" 
+        rightButton={{
+          label: 'Ajustes',
+          onPress: () => navigation.navigate('Privacy'),
+          variant: 'info'
+        }}
+      />
 
       <FlatList
         data={classes}
@@ -120,11 +110,7 @@ export default function HomeScreen({ navigation }: Props) {
           />
         )}
         contentContainerStyle={{ paddingBottom: 20 }}
-        ListEmptyComponent={
-          <Text className="text-center text-gray-500 mt-10">
-            Nenhuma aula programada para hoje.
-          </Text>
-        }
+        ListEmptyComponent={<EmptyState message="Nenhuma aula programada para hoje." />}
       />
     </View>
   );

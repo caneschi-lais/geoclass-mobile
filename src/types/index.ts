@@ -22,3 +22,24 @@ export interface AttendanceLog {
   subject: string;
 }
 
+export type UserRole = 'ALUNO' | 'PROFESSOR' | 'COORDENADOR';
+
+export interface StudentAttendance {
+  id: string;
+  name: string;
+  ra: string;
+  time: string; // Hora que bateu o ponto
+}
+
+export interface CoordinatorAnalytics {
+  totalStudents: number;
+  activeClasses: number;
+}
+
+export interface StudentRisk {
+  id: string;
+  name: string;
+  ra: string;
+  attendancePercentage: number;
+}
+

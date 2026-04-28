@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Image, ActivityIndicator } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { getToken } from '../services/authStorage';
+import { getToken, getRole } from '../services/authStorage';
 import { RootStackParamList } from '../navigation/AppNavigator';
 
 type Props = {
@@ -13,11 +13,13 @@ export default function SplashScreen({ navigation }: Props) {
     const checkAuthStatus = async () => {
       try {
         const token = await getToken();
+        const role = await getRole();
         
-        // Simular um tempo minimo de splash de 2 segundos
         setTimeout(() => {
-          if (token) {
-            navigation.replace('Home');
+          if (token && role) {
+            if (role === 'PROFESSOR') navigation.replace('ProfessorApp');
+            else if (role === 'COORDENADOR') navigation.replace('CoordinatorApp');
+            else navigation.replace('AlunoApp');
           } else {
             navigation.replace('Login');
           }
