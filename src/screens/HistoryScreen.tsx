@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, FlatList } from 'react-native';
-import { mockApi } from '../services/mockApi';
+import api from '../services/api';
 import { AttendanceLog } from '../types';
 import ScreenHeader from '../components/ScreenHeader';
 import LoadingOverlay from '../components/LoadingOverlay';
@@ -17,8 +17,8 @@ export default function HistoryScreen() {
 
   const loadHistory = async () => {
     try {
-      const data = await mockApi.getHistorico('aluno_id_mock');
-      setLogs(data);
+      const response = await api.get('/aluno/historico');
+      setLogs(response.data);
     } catch (error) {
       console.log('Error loading history', error);
     } finally {

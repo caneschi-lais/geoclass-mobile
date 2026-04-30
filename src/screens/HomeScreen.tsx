@@ -3,7 +3,7 @@ import { View, FlatList, Alert, Platform } from 'react-native';
 import * as Location from 'expo-location';
 import * as Device from 'expo-device';
 import * as Application from 'expo-application';
-import { mockApi } from '../services/mockApi';
+import api from '../services/api';
 import { ClassData } from '../types';
 import ClassCard from '../components/ClassCard';
 import ScreenHeader from '../components/ScreenHeader';
@@ -33,8 +33,8 @@ export default function HomeScreen({ navigation }: Props) {
         );
       }
 
-      const aulas = await mockApi.getAulasHoje();
-      setClasses(aulas);
+      const response = await api.get('/aluno/aulas/hoje');
+      setClasses(response.data);
     } catch (error) {
       Alert.alert('Erro', 'Falha ao carregar os dados.');
     } finally {
@@ -74,7 +74,12 @@ export default function HomeScreen({ navigation }: Props) {
 
       const deviceId = await getUniqueDeviceId();
 
-      await mockApi.registrarPresenca(aula.id, lat, lon, deviceId);
+      await api.post('/aluno/presenca', {
+        classId: aula.id,
+        lat,
+        lon,
+        deviceId
+      });
       
       Alert.alert('Sucesso', 'Presença registrada com sucesso!');
       

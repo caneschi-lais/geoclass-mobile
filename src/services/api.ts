@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { getToken } from './authStorage';
 
-// Usar API local, mude para IP real do seu backend ou emulador/dispositivo
+// ATENÇÃO: Substitua pelo seu IP da rede Wi-Fi! Ex: http://192.168.0.15:3000/api
+// Se usar Emulador Android nativo sem Expo, pode usar http://10.0.2.2:3000/api
 const api = axios.create({
-  baseURL: 'http://localhost:3000', // Mude para URL real quando existir
+  baseURL: 'http://192.168.X.X:3000/api', 
   timeout: 10000,
 });
 

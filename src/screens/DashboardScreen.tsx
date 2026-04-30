@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, FlatList } from 'react-native';
-import { mockApi } from '../services/mockApi';
+import api from '../services/api';
 import { DashboardStat } from '../types';
 import ScreenHeader from '../components/ScreenHeader';
 import LoadingOverlay from '../components/LoadingOverlay';
@@ -17,8 +17,8 @@ export default function DashboardScreen() {
 
   const loadDashboard = async () => {
     try {
-      const data = await mockApi.getDashboard('aluno_id_mock');
-      setStats(data);
+      const response = await api.get('/aluno/dashboard');
+      setStats(response.data);
     } catch (error) {
       console.log('Error loading dashboard', error);
     } finally {

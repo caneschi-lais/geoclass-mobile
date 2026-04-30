@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
-import { mockApi } from '../../services/mockApi';
+import api from '../../services/api';
 import { ClassData } from '../../types';
 import { deleteToken } from '../../services/authStorage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -24,8 +24,8 @@ export default function ProfessorClassesScreen({ navigation }: Props) {
 
   const loadClasses = async () => {
     try {
-      const data = await mockApi.getProfessorTurmas('prof_id_mock');
-      setClasses(data);
+      const response = await api.get('/professor/turmas');
+      setClasses(response.data);
     } catch (error) {
       console.log('Error loading classes', error);
     } finally {

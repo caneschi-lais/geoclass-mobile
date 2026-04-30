@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, FlatList } from 'react-native';
-import { mockApi } from '../../services/mockApi';
+import api from '../../services/api';
 import { StudentAttendance } from '../../types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfessorStackParamList } from '../../navigation/ProfessorNavigator';
@@ -22,8 +22,8 @@ export default function ClassAttendanceScreen({ route, navigation }: Props) {
 
   const loadAttendance = async () => {
     try {
-      const data = await mockApi.getTurmaPresencas(classId);
-      setStudents(data);
+      const response = await api.get(`/professor/turma/${classId}/presencas`);
+      setStudents(response.data);
     } catch (error) {
       console.log('Error loading attendance', error);
     } finally {

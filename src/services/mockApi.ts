@@ -9,8 +9,8 @@ function getDistanceInMeters(lat1: number, lon1: number, lat2: number, lon2: num
   const dl = (lon2 - lon1) * Math.PI / 180;
 
   const a = Math.sin(dp / 2) * Math.sin(dp / 2) +
-            Math.cos(p1) * Math.cos(p2) *
-            Math.sin(dl / 2) * Math.sin(dl / 2);
+    Math.cos(p1) * Math.cos(p2) *
+    Math.sin(dl / 2) * Math.sin(dl / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   return R * c;
@@ -23,10 +23,10 @@ const MOCK_CLASSES: ClassData[] = [
     subject: 'Matemática Aplicada',
     professor: 'Prof. Carlos',
     // Mockando para o horário atual pra não falhar por tempo sempre
-    time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), 
+    time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
     latitude: -23.5505, // Coordenada da sala de aula (Ex: Praça da Sé)
     longitude: -46.6333,
-    radiusMeters: 50, // Permite check-in num raio de 50m
+    radiusMeters: 1000000000000000000, // Permite check-in num raio de 50m
   },
   {
     id: '2',
@@ -73,9 +73,9 @@ export const mockApi = {
         if (diffMins > 15) {
           return reject(new Error(`Atraso não permitido. Você chegou ${diffMins} minutos atrasado (Tolerância: 15 min).`));
         }
-        
+
         if (diffMins < -60) {
-           return reject(new Error('Muito cedo para registrar presença nesta aula.'));
+          return reject(new Error('Muito cedo para registrar presença nesta aula.'));
         }
 
         // Sucesso

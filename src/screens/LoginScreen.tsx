@@ -23,32 +23,24 @@ export default function LoginScreen({ navigation }: Props) {
 
     setLoading(true);
     try {
-      // Faz a requisição de login (simulado ou real)
-      const response = await api.post('/login', { email, password }).catch(() => {
-         // Fallback provisório para o mock enquanto a API real não sobe
-         return { data: { token: 'mocked-jwt-token-123' } };
-      });
+      const response = await api.post('/login', { email, password });
       
-      const token = response.data?.token;
+      const { token, user } = response.data;
 
-      if (token) {
-        let role: UserRole = 'ALUNO';
-        if (email.toLowerCase().includes('prof')) role = 'PROFESSOR';
-        if (email.toLowerCase().includes('coord')) role = 'COORDENADOR';
-
+      if (token && user?.role) {
         await saveToken(token);
-        await saveRole(role);
+        await saveRole(user.role);
         
         // Redireciona para o fluxo principal baseado no Role
-        if (role === 'PROFESSOR') navigation.replace('ProfessorApp');
-        else if (role === 'COORDENADOR') navigation.replace('CoordinatorApp');
+        if (user.role === 'PROFESSOR') navigation.replace('ProfessorApp');
+        else if (user.role === 'COORDENADOR') navigation.replace('CoordinatorApp');
         else navigation.replace('AlunoApp');
       } else {
-        Alert.alert('Erro', 'Token não retornado pelo servidor.');
+        Alert.alert('Erro', 'Token ou perfil não retornado pelo servidor.');
       }
     } catch (error: any) {
       console.log('Erro de login:', error);
-      const message = error.response?.data?.message || 'Falha ao conectar com o servidor.';
+      const message = error.response?.data?.error || 'Falha ao conectar com o servidor. Verifique se a API está rodando.';
       Alert.alert('Erro de Autenticação', message);
     } finally {
       setLoading(false);

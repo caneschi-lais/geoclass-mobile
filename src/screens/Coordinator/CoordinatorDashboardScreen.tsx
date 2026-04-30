@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TextInput } from 'react-native';
-import { mockApi } from '../../services/mockApi';
+import api from '../../services/api';
 import { CoordinatorAnalytics, StudentRisk } from '../../types';
 import { deleteToken } from '../../services/authStorage';
 import { Feather } from '@expo/vector-icons';
@@ -26,10 +26,10 @@ export default function CoordinatorDashboardScreen({ navigation }: Props) {
 
   const loadAnalytics = async () => {
     try {
-      const data = await mockApi.getCoordinatorAnalytics();
-      setAnalytics(data.analytics);
-      setAtRiskStudents(data.atRisk);
-      setFilteredStudents(data.atRisk);
+      const response = await api.get('/coordenador/analytics');
+      setAnalytics(response.data.analytics);
+      setAtRiskStudents(response.data.atRisk);
+      setFilteredStudents(response.data.atRisk);
     } catch (error) {
       console.log('Error loading coordinator analytics', error);
     } finally {
