@@ -9,6 +9,7 @@ import { Feather } from '@expo/vector-icons';
 import ScreenHeader from '../../components/ScreenHeader';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import EmptyState from '../../components/EmptyState';
+import ChangeRoomModal from '../../components/ChangeRoomModal';
 
 type Props = {
   navigation: NativeStackNavigationProp<ProfessorStackParamList, 'Classes'>;
@@ -17,6 +18,9 @@ type Props = {
 export default function ProfessorClassesScreen({ navigation }: Props) {
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedClassId, setSelectedClassId] = useState('');
+  const [selectedSchedule, setSelectedSchedule] = useState('');
 
   useEffect(() => {
     loadClasses();
@@ -38,19 +42,44 @@ export default function ProfessorClassesScreen({ navigation }: Props) {
     navigation.replace('Login' as any); // Type hacking for generic auth flow
   };
 
+  const openChangeRoomModal = (classId: string, time: string) => {
+    setSelectedClassId(classId);
+    setSelectedSchedule(time);
+    setModalVisible(true);
+  };
+
   const renderItem = ({ item }: { item: ClassData }) => (
-    <TouchableOpacity 
-      className="bg-white rounded-xl p-5 mb-4 shadow-sm border border-gray-100"
-      onPress={() => navigation.navigate('Attendance', { classId: item.id, subjectName: item.subject })}
-    >
-      <View className="flex-row justify-between items-center">
+    <View className="bg-white rounded-xl p-5 mb-4 shadow-sm border border-gray-100">
+      <TouchableOpacity 
+        className="flex-row justify-between items-center mb-4"
+        onPress={() => navigation.navigate('Attendance', { classId: item.id, subjectName: item.subject })}
+      >
         <View className="flex-1 pr-4">
           <Text className="text-xl font-bold text-gray-800">{item.subject}</Text>
           <Text className="text-gray-500 font-medium mt-1">{item.time}</Text>
         </View>
         <Feather name="chevron-right" size={24} color="#94a3b8" />
+      </TouchableOpacity>
+      
+      {/* Botões de Ação */}
+      <View className="flex-row justify-between mt-2">
+        <TouchableOpacity 
+          className="flex-1 flex-row items-center justify-center bg-gray-50 py-3 rounded-lg border border-gray-200 mr-2"
+          onPress={() => openChangeRoomModal(item.id, item.time)}
+        >
+          <Feather name="map" size={16} color="#64748b" />
+          <Text className="text-gray-600 font-bold ml-2 text-xs">Trocar Sala</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          className="flex-1 flex-row items-center justify-center bg-sky-50 py-3 rounded-lg border border-sky-200"
+          onPress={() => navigation.navigate('ManualAttendance', { classId: item.id, subjectName: item.subject })}
+        >
+          <Feather name="video" size={16} color="#0ea5e9" />
+          <Text className="text-sky-600 font-bold ml-2 text-xs">Chamada EAD</Text>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 
   if (loading) return <LoadingOverlay />;
@@ -73,6 +102,14 @@ export default function ProfessorClassesScreen({ navigation }: Props) {
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 20 }}
         ListEmptyComponent={<EmptyState message="Nenhuma turma cadastrada." />}
+      />
+
+      <ChangeRoomModal
+        visible={modalVisible}
+        classId={selectedClassId}
+        scheduleTime={selectedSchedule}
+        onClose={() => setModalVisible(false)}
+        onSuccess={() => { /* Opção de dar reload se precisasse mostrar a sala nova na lista */ }}
       />
     </View>
   );

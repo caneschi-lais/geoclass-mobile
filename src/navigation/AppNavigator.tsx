@@ -4,7 +4,7 @@ import SplashScreen from '../screens/SplashScreen';
 import LoginScreen from '../screens/LoginScreen';
 import TabNavigator from './TabNavigator';
 import ProfessorNavigator from './ProfessorNavigator';
-import CoordinatorDashboardScreen from '../screens/Coordinator/CoordinatorDashboardScreen';
+import CoordinatorNavigator from './CoordinatorNavigator';
 import PrivacyScreen from '../screens/PrivacyScreen';
 
 export type RootStackParamList = {
@@ -25,7 +25,7 @@ export default function AppNavigator() {
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="AlunoApp" component={TabNavigator} />
       <Stack.Screen name="ProfessorApp" component={ProfessorNavigator} />
-      <Stack.Screen name="CoordinatorApp" component={CoordinatorDashboardScreen} />
+      <Stack.Screen name="CoordinatorApp" component={CoordinatorNavigator} />
       <Stack.Screen name="Privacy" component={PrivacyScreen} />
     </Stack.Navigator>
   );
