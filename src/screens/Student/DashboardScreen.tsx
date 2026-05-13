@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, FlatList } from 'react-native';
-import api from '../services/api';
-import { DashboardStat } from '../types';
-import ScreenHeader from '../components/ScreenHeader';
-import LoadingOverlay from '../components/LoadingOverlay';
-import DashboardStatCard from '../components/DashboardStatCard';
-import EmptyState from '../components/EmptyState';
+import api from '../../services/api';
+import { DashboardStat } from '../../types';
+import ScreenHeader from '../../components/ScreenHeader';
+import LoadingOverlay from '../../components/LoadingOverlay';
+import DashboardStatCard from '../../components/DashboardStatCard';
+import EmptyState from '../../components/EmptyState';
 
 export default function DashboardScreen() {
   const [stats, setStats] = useState<DashboardStat[]>([]);
@@ -30,11 +30,13 @@ export default function DashboardScreen() {
 
   return (
     <View className="flex-1 bg-gray-50 pt-14 px-4">
-      <ScreenHeader 
-        title="Meu Desempenho" 
-        subtitle="Acompanhe sua frequência nas disciplinas." 
+      {/* Cabeçalho com título e subtítulo */}
+      <ScreenHeader
+        title="Meu Desempenho"
+        subtitle="Acompanhe sua frequência nas disciplinas."
       />
-      
+
+      {/* Cards com estatísticas de frequência */}
       <FlatList
         data={stats}
         keyExtractor={(item) => item.id}

@@ -93,7 +93,15 @@ export default function StudentsListScreen({ navigation, route }: Props) {
             }
           }
         });
-        const html = ExportService.generateHTMLTable(`Relatório de Alunos - ${semesterId}`, headers, rows);
+        
+        // Criando dados para o gráfico (Top 5 alunos com mais faltas)
+        const sortedData = [...data].sort((a: any, b: any) => b.absencePercentage - a.absencePercentage).slice(0, 5);
+        let chartData: {label: string, value: number}[] = sortedData.map((s: any) => ({
+          label: s.name,
+          value: s.absencePercentage
+        }));
+
+        const html = ExportService.generateHTMLTable(`Relatório de Alunos - ${semesterId}`, headers, rows, chartData);
         await ExportService.exportToPDF(html, `Relatorio_Alunos_${semesterId}`);
       }
     } catch (error) {
@@ -138,10 +146,8 @@ export default function StudentsListScreen({ navigation, route }: Props) {
       {exporting && <LoadingOverlay message="Gerando relatório..." />}
       <ScreenHeader 
         title={`Alunos - ${semesterId}`} 
-        leftButton={{
-          icon: 'arrow-left',
-          onPress: () => navigation.goBack()
-        }}
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
         rightButton={{
           label: 'Exportar',
           onPress: () => setExportModalVisible(true),

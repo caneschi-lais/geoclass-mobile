@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, Alert } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import api from '../../services/api';
+import api from '../services/api';
 
 type Room = {
   id: string;
@@ -40,14 +40,14 @@ export default function ChangeRoomModal({ visible, classId, scheduleTime, onClos
     }
   };
 
-  const handleConfirm = async (roomId: string) => {
+  const handleConfirm = async (roomId: string | null) => {
     setSaving(true);
     try {
       await api.post(`/professor/turma/${classId}/trocar-sala`, {
         roomId,
         date: selectedDate
       });
-      Alert.alert('Sucesso', 'Sala alterada para esta aula!');
+      Alert.alert('Sucesso', roomId ? 'Sala alterada para esta aula!' : 'Sala padrão restaurada com sucesso!');
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -73,6 +73,16 @@ export default function ChangeRoomModal({ visible, classId, scheduleTime, onClos
           <Text className="text-sm text-gray-500 mb-4">
             A troca afetará o Geofencing apenas na data de hoje ({new Date(selectedDate).toLocaleDateString('pt-BR')}) para o horário das {scheduleTime}.
           </Text>
+
+          {/* Botão de Restaurar Sala Original */}
+          <TouchableOpacity 
+            disabled={saving}
+            onPress={() => handleConfirm(null)}
+            className="bg-sky-50 py-3 rounded-xl mb-4 border border-sky-200 items-center flex-row justify-center"
+          >
+            <Feather name="refresh-ccw" size={16} color="#0369a1" />
+            <Text className="text-sky-700 font-bold ml-2">Restaurar Sala Padrão</Text>
+          </TouchableOpacity>
 
           <Text className="font-bold text-gray-700 mb-2 uppercase tracking-wider text-xs">Salas Disponíveis</Text>
           

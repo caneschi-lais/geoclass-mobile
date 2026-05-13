@@ -6,6 +6,7 @@ export interface ClassData {
   latitude: number;
   longitude: number;
   radiusMeters: number;
+  room?: string;
 }
 
 export interface DashboardStat {

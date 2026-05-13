@@ -49,21 +49,21 @@ export default function ProfessorClassesScreen({ navigation }: Props) {
   };
 
   const renderItem = ({ item }: { item: ClassData }) => (
+    //Cartão das classes
     <View className="bg-white rounded-xl p-5 mb-4 shadow-sm border border-gray-100">
-      <TouchableOpacity 
-        className="flex-row justify-between items-center mb-4"
-        onPress={() => navigation.navigate('Attendance', { classId: item.id, subjectName: item.subject })}
-      >
+      <TouchableOpacity className="flex-row justify-between items-center mb-4"
+        onPress={() => navigation.navigate('Attendance', { classId: item.id, subjectName: item.subject })}>
         <View className="flex-1 pr-4">
           <Text className="text-xl font-bold text-gray-800">{item.subject}</Text>
-          <Text className="text-gray-500 font-medium mt-1">{item.time}</Text>
+          <Text className="text-gray-500 font-medium mt-1">{item.time} - {item.room}</Text>
         </View>
+
         <Feather name="chevron-right" size={24} color="#94a3b8" />
       </TouchableOpacity>
-      
-      {/* Botões de Ação */}
+
+      {/* Botões para trocar de sala ou aula EAD */}
       <View className="flex-row justify-between mt-2">
-        <TouchableOpacity 
+        <TouchableOpacity
           className="flex-1 flex-row items-center justify-center bg-gray-50 py-3 rounded-lg border border-gray-200 mr-2"
           onPress={() => openChangeRoomModal(item.id, item.time)}
         >
@@ -71,12 +71,12 @@ export default function ProfessorClassesScreen({ navigation }: Props) {
           <Text className="text-gray-600 font-bold ml-2 text-xs">Trocar Sala</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           className="flex-1 flex-row items-center justify-center bg-sky-50 py-3 rounded-lg border border-sky-200"
           onPress={() => navigation.navigate('ManualAttendance', { classId: item.id, subjectName: item.subject })}
         >
           <Feather name="video" size={16} color="#0ea5e9" />
-          <Text className="text-sky-600 font-bold ml-2 text-xs">Chamada EAD</Text>
+          <Text className="text-sky-600 font-bold ml-2 text-xs">Aula EAD</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -86,16 +86,17 @@ export default function ProfessorClassesScreen({ navigation }: Props) {
 
   return (
     <View className="flex-1 bg-gray-50 pt-14 px-4">
-      <ScreenHeader 
-        title="Minhas Turmas" 
-        subtitle="Selecione uma turma para ver a presença de hoje." 
+      {/* Cabeçalho com título e botão de sair */}
+      <ScreenHeader
+        title="Minhas Turmas"
+        subtitle="Selecione uma turma para ver a presença de hoje."
         rightButton={{
           label: 'Sair',
           onPress: handleLogout,
           variant: 'danger'
         }}
       />
-      
+
       <FlatList
         data={classes}
         keyExtractor={(item) => item.id}
@@ -104,12 +105,13 @@ export default function ProfessorClassesScreen({ navigation }: Props) {
         ListEmptyComponent={<EmptyState message="Nenhuma turma cadastrada." />}
       />
 
+      {/* Modal para trocar de sala */}
       <ChangeRoomModal
         visible={modalVisible}
         classId={selectedClassId}
         scheduleTime={selectedSchedule}
         onClose={() => setModalVisible(false)}
-        onSuccess={() => { /* Opção de dar reload se precisasse mostrar a sala nova na lista */ }}
+        onSuccess={() => loadClasses()}
       />
     </View>
   );

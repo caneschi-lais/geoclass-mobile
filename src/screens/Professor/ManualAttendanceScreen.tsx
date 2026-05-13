@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Switch, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Switch, Alert, Platform } from 'react-native';
 import api from '../../services/api';
 import ScreenHeader from '../../components/ScreenHeader';
 import LoadingOverlay from '../../components/LoadingOverlay';
@@ -67,9 +67,14 @@ export default function ManualAttendanceScreen({ navigation, route }: Props) {
 
       await api.post(`/professor/turma/${classId}/chamada-manual`, { attendances: payload });
       
-      Alert.alert('Sucesso', 'Chamada remota salva com sucesso!', [
-        { text: 'OK', onPress: () => navigation.goBack() }
-      ]);
+      if (Platform.OS === 'web') {
+        window.alert('Chamada remota salva com sucesso!');
+        navigation.goBack();
+      } else {
+        Alert.alert('Sucesso', 'Chamada remota salva com sucesso!', [
+          { text: 'OK', onPress: () => navigation.goBack() }
+        ]);
+      }
     } catch (error: any) {
       Alert.alert('Erro', error.response?.data?.error || 'Erro ao salvar chamada.');
     } finally {
@@ -110,10 +115,8 @@ export default function ManualAttendanceScreen({ navigation, route }: Props) {
       <ScreenHeader 
         title="Chamada EAD"
         subtitle={subjectName}
-        leftButton={{
-          icon: 'arrow-left',
-          onPress: () => navigation.goBack()
-        }}
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
       />
 
       <View className="bg-sky-50 border border-sky-100 p-4 rounded-xl mb-4">

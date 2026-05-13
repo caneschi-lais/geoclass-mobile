@@ -24,13 +24,13 @@ export default function LoginScreen({ navigation }: Props) {
     setLoading(true);
     try {
       const response = await api.post('/login', { email, password });
-      
+
       const { token, user } = response.data;
 
       if (token && user?.role) {
         await saveToken(token);
         await saveRole(user.role);
-        
+
         // Redireciona para o fluxo principal baseado no Role
         if (user.role === 'PROFESSOR') navigation.replace('ProfessorApp');
         else if (user.role === 'COORDENADOR') navigation.replace('CoordinatorApp');
@@ -49,12 +49,12 @@ export default function LoginScreen({ navigation }: Props) {
 
   return (
     <View className="flex-1 justify-center items-center bg-white p-6">
-      <Image 
-        source={require('../../assets/images/logo.jpg')} 
-        className="w-32 h-32 mb-10"
+      <Image
+        source={require('../../assets/images/logo.jpg')}
+        className="w-24 h-24 mb-6"
         resizeMode="contain"
       />
-      
+
       <Text className="text-3xl font-bold text-gray-800 mb-8">GeoClass</Text>
 
       <View className="w-full max-w-sm mb-4">
@@ -80,7 +80,7 @@ export default function LoginScreen({ navigation }: Props) {
         />
       </View>
 
-      <TouchableOpacity 
+      <TouchableOpacity
         className={`w-full max-w-sm rounded-lg p-4 items-center ${loading ? 'bg-sky-400' : 'bg-sky-500'}`}
         onPress={handleLogin}
         disabled={loading}

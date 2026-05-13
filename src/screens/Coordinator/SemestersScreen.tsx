@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, TextInput } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import api from '../../services/api';
 import { deleteToken } from '../../services/authStorage';
@@ -24,6 +24,13 @@ export default function SemestersScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(true);
   const [exportModalVisible, setExportModalVisible] = useState(false);
   const [exporting, setExporting] = useState(false);
+  
+  // Estados para Cadastro de Sala
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+  const [roomName, setRoomName] = useState('');
+  const [roomLat, setRoomLat] = useState('');
+  const [roomLon, setRoomLon] = useState('');
+  const [creatingRoom, setCreatingRoom] = useState(false);
 
   useEffect(() => {
     loadSemesters();
@@ -79,13 +86,44 @@ export default function SemestersScreen({ navigation }: Props) {
             }
           }
         });
-        const html = ExportService.generateHTMLTable('Relatório de Semestres', headers, rows);
+
+        // Criando dados para o gráfico baseado na visão atual (Semestres)
+        let chartData: {label: string, value: number}[] = data.map((s: any) => ({
+          label: `Semestre ${s.semester}`,
+          value: s.absencePercentage
+        }));
+
+        const html = ExportService.generateHTMLTable('Relatório de Semestres', headers, rows, chartData);
         await ExportService.exportToPDF(html, 'Relatorio_Semestres');
       }
     } catch (error) {
       Alert.alert('Erro', 'Falha ao exportar relatório.');
     } finally {
       setExporting(false);
+    }
+  };
+
+  const handleCreateRoom = async () => {
+    if (!roomName || !roomLat || !roomLon) {
+      Alert.alert('Aviso', 'Preencha todos os campos.');
+      return;
+    }
+    setCreatingRoom(true);
+    try {
+      await api.post('/coordenador/sala', {
+        name: roomName,
+        latitude: parseFloat(roomLat),
+        longitude: parseFloat(roomLon)
+      });
+      Alert.alert('Sucesso', 'Sala cadastrada com sucesso!');
+      setRoomName('');
+      setRoomLat('');
+      setRoomLon('');
+      setIsAccordionOpen(false);
+    } catch (error: any) {
+      Alert.alert('Erro', error.response?.data?.error || 'Erro ao cadastrar sala.');
+    } finally {
+      setCreatingRoom(false);
     }
   };
 
@@ -127,6 +165,63 @@ export default function SemestersScreen({ navigation }: Props) {
           variant: 'danger'
         }}
       />
+
+      {/* Acordeão de Cadastro de Sala */}
+      <View className="mb-4">
+        <TouchableOpacity 
+          className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex-row justify-between items-center"
+          onPress={() => setIsAccordionOpen(!isAccordionOpen)}
+        >
+          <View className="flex-row items-center">
+            <Feather name="plus-circle" size={20} color="#0ea5e9" />
+            <Text className="text-gray-800 font-bold ml-2">Cadastrar Nova Sala</Text>
+          </View>
+          <Feather name={isAccordionOpen ? "chevron-up" : "chevron-down"} size={20} color="#94a3b8" />
+        </TouchableOpacity>
+
+        {isAccordionOpen && (
+          <View className="bg-white p-4 mt-2 rounded-xl shadow-sm border border-gray-100">
+            <Text className="text-xs font-bold text-gray-500 uppercase mb-1">Nome da Sala</Text>
+            <TextInput 
+              className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-3 text-gray-800"
+              placeholder="Ex: Lab de Informática 1"
+              value={roomName}
+              onChangeText={setRoomName}
+            />
+
+            <View className="flex-row justify-between mb-4">
+              <View className="flex-1 mr-2">
+                <Text className="text-xs font-bold text-gray-500 uppercase mb-1">Latitude</Text>
+                <TextInput 
+                  className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-800"
+                  placeholder="Ex: -23.5505"
+                  keyboardType="numeric"
+                  value={roomLat}
+                  onChangeText={setRoomLat}
+                />
+              </View>
+              <View className="flex-1 ml-2">
+                <Text className="text-xs font-bold text-gray-500 uppercase mb-1">Longitude</Text>
+                <TextInput 
+                  className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-800"
+                  placeholder="Ex: -46.6333"
+                  keyboardType="numeric"
+                  value={roomLon}
+                  onChangeText={setRoomLon}
+                />
+              </View>
+            </View>
+
+            <TouchableOpacity 
+              className={`py-3 rounded-lg items-center ${creatingRoom ? 'bg-sky-400' : 'bg-sky-500'}`}
+              onPress={handleCreateRoom}
+              disabled={creatingRoom}
+            >
+              <Text className="text-white font-bold">{creatingRoom ? 'Salvando...' : 'Salvar Sala'}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
 
       <View className="flex-row justify-between items-center mb-4">
         <Text className="text-xl font-bold text-gray-800">Semestres Ativos</Text>

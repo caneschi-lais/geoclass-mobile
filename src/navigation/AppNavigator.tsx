@@ -5,7 +5,7 @@ import LoginScreen from '../screens/LoginScreen';
 import TabNavigator from './TabNavigator';
 import ProfessorNavigator from './ProfessorNavigator';
 import CoordinatorNavigator from './CoordinatorNavigator';
-import PrivacyScreen from '../screens/PrivacyScreen';
+import PrivacyScreen from '../screens/Student/PrivacyScreen';
 
 export type RootStackParamList = {
   Splash: undefined;

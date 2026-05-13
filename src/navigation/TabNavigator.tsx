@@ -2,9 +2,9 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import HomeScreen from '../screens/HomeScreen';
-import DashboardScreen from '../screens/DashboardScreen';
-import HistoryScreen from '../screens/HistoryScreen';
+import HomeScreen from '../screens/Student/HomeScreen';
+import DashboardScreen from '../screens/Student/DashboardScreen';
+import HistoryScreen from '../screens/Student/HistoryScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -30,23 +30,23 @@ export default function TabNavigator() {
         }
       }}
     >
-      <Tab.Screen 
-        name="Hoje" 
-        component={HomeScreen} 
+      <Tab.Screen
+        name="Matérias"
+        component={HomeScreen}
         options={{
           tabBarIcon: ({ color, size }) => <Feather name="map-pin" size={size} color={color} />
         }}
       />
-      <Tab.Screen 
-        name="Dashboard" 
-        component={DashboardScreen} 
+      <Tab.Screen
+        name="Desempenho"
+        component={DashboardScreen}
         options={{
           tabBarIcon: ({ color, size }) => <Feather name="pie-chart" size={size} color={color} />
         }}
       />
-      <Tab.Screen 
-        name="Histórico" 
-        component={HistoryScreen} 
+      <Tab.Screen
+        name="Histórico"
+        component={HistoryScreen}
         options={{
           tabBarIcon: ({ color, size }) => <Feather name="clock" size={size} color={color} />
         }}

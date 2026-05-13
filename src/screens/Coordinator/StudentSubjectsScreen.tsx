@@ -61,7 +61,16 @@ export default function StudentSubjectsScreen({ navigation, route }: Props) {
           const percHtml = s.absencePercentage >= 25 ? `<span class="high-absence">${s.absencePercentage}%</span>` : `${s.absencePercentage}%`;
           return [s.subject, s.room_name, s.total_classes.toString(), percHtml];
         });
-        const html = ExportService.generateHTMLTable(`Relatório do Aluno: ${studentName}`, headers, rows);
+
+        // Gráfico com as matérias com mais faltas
+        const chartData = [...subjects]
+          .sort((a, b) => b.absencePercentage - a.absencePercentage)
+          .map(s => ({
+            label: s.subject,
+            value: s.absencePercentage
+          }));
+
+        const html = ExportService.generateHTMLTable(`Relatório do Aluno: ${studentName}`, headers, rows, chartData);
         await ExportService.exportToPDF(html, `Relatorio_Materias_${studentName.replace(/\s+/g, '_')}`);
       }
     } catch (error) {
@@ -81,29 +90,29 @@ export default function StudentSubjectsScreen({ navigation, route }: Props) {
             <Text className="text-gray-500 ml-1 font-medium">{item.room_name}</Text>
           </View>
         </View>
-        
+
         <View className="items-end bg-gray-50 p-2 rounded-lg">
           <Text className="text-xs text-gray-400 mb-1">Aulas Previstas</Text>
           <Text className="text-md font-bold text-gray-700">{item.total_classes}</Text>
         </View>
       </View>
-      
+
       <View className="flex-row items-center justify-between">
         <Text className="text-gray-600 font-medium">Índice de Faltas</Text>
         <Text className={`text-xl font-black ${item.absencePercentage >= 25 ? 'text-red-500' : 'text-emerald-500'}`}>
           {item.absencePercentage}%
         </Text>
       </View>
-      
+
       {/* Barra de Progresso Visual */}
       <View className="w-full h-2 bg-gray-200 rounded-full mt-3 overflow-hidden flex-row">
-        <View 
-          className="h-full bg-emerald-400" 
-          style={{ width: `${100 - item.absencePercentage}%` }} 
+        <View
+          className="h-full bg-emerald-400"
+          style={{ width: `${100 - item.absencePercentage}%` }}
         />
-        <View 
-          className="h-full bg-red-400" 
-          style={{ width: `${item.absencePercentage}%` }} 
+        <View
+          className="h-full bg-red-400"
+          style={{ width: `${item.absencePercentage}%` }}
         />
       </View>
     </View>
@@ -114,12 +123,10 @@ export default function StudentSubjectsScreen({ navigation, route }: Props) {
   return (
     <View className="flex-1 bg-gray-50 pt-14 px-4">
       {exporting && <LoadingOverlay message="Gerando relatório..." />}
-      <ScreenHeader 
-        title="Detalhes do Aluno" 
-        leftButton={{
-          icon: 'arrow-left',
-          onPress: () => navigation.goBack()
-        }}
+      <ScreenHeader
+        title="Detalhes do Aluno"
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
         rightButton={{
           label: 'Exportar',
           onPress: () => setExportModalVisible(true),
@@ -129,7 +136,7 @@ export default function StudentSubjectsScreen({ navigation, route }: Props) {
 
       <View className="mb-6">
         <Text className="text-sm text-gray-500 uppercase tracking-wider font-bold mb-1">Aluno</Text>
-        <Text className="text-2xl font-black text-gray-800">{studentName}</Text>
+        <Text className="text-xl font-black text-gray-800">{studentName}</Text>
         <Text className="text-sky-600 font-medium mt-1">Semestre {semesterId}</Text>
       </View>
 

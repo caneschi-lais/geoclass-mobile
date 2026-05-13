@@ -15,12 +15,12 @@ type ScreenHeaderProps = {
   };
 };
 
-export default function ScreenHeader({ 
-  title, 
-  subtitle, 
-  showBackButton = false, 
-  onBackPress, 
-  rightButton 
+export default function ScreenHeader({
+  title,
+  subtitle,
+  showBackButton = false,
+  onBackPress,
+  rightButton
 }: ScreenHeaderProps) {
 
   const getRightButtonStyles = () => {
@@ -41,22 +41,22 @@ export default function ScreenHeader({
   return (
     <View className="flex-row items-center mb-6">
       {showBackButton && (
-        <TouchableOpacity 
-          onPress={onBackPress} 
+        <TouchableOpacity
+          onPress={onBackPress}
           className="mr-3 bg-white p-2 rounded-full shadow-sm border border-gray-100"
         >
           <Feather name="arrow-left" size={24} color="#334155" />
         </TouchableOpacity>
       )}
-      
+
       <View className="flex-1">
-        <Text className="text-3xl font-extrabold text-gray-800" numberOfLines={1}>{title}</Text>
+        <Text className="text-2xl font-extrabold text-gray-800" numberOfLines={1}>{title}</Text>
         {subtitle && <Text className="text-gray-500 font-medium">{subtitle}</Text>}
       </View>
 
       {rightButton && (
-        <TouchableOpacity 
-          onPress={rightButton.onPress} 
+        <TouchableOpacity
+          onPress={rightButton.onPress}
           className={`rounded-lg flex-row items-center ${rightBtnStyle.container} ${rightButton.label ? '' : 'rounded-full'}`}
         >
           {rightButton.icon && <Feather name={rightButton.icon} size={20} color={rightBtnStyle.iconColor} />}
